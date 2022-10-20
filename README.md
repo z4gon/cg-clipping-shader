@@ -1,53 +1,98 @@
-# Unity Template Project for Built-In RP
+# Clipping pixels in a Shader
 
-{{YOUR_PROJECT_DESCRIPTION_HERE}} in Unity **Unity 2021.3.10f1**
+With the Cg programming language for the Built-in RP for **Unity 2021.3.10f1**
+
+### References
+
+- [Unity Shaders course by Nik Lever](https://www.udemy.com/course/learn-unity-shaders-from-scratch)
 
 ## Features
 
-- [Feature](#feature)
-- [Feature](#feature)
-- [Feature](#feature)
+1. Clipping using Perlin Noise.
+1. Clipping using cosine function of the Object position of vertices.
+1. Shadow casting and culling manipulation.
+1. Implement a basic Lambert lighting model for better graphic appreciation of the clipping effect.
 
 ## Screenshots
 
-![Gif](./docs/1.gif)
-![Gif](./docs/1.gif)
-
----
-
-## Feature
-
-1. Implementation detail.
-1. Implementation detail.
-1. Implementation detail.
-
-![Gif](./docs/1.gif)
-![Gif](./docs/1.gif)
-
-## Feature
-
-1. Implementation detail.
-1. Implementation detail.
-1. Implementation detail.
-
-![Gif](./docs/1.gif)
-![Gif](./docs/1.gif)
-
----
+![Gif](./docs/thumbnail.gif)
+![Gif](./docs/2.gif)
 
 ## Implementation explained
 
-1. **Step**
+1. **Perlin Noise**
 
-   1. Sub Step.
-   1. Sub Step.
+   1. Calculate the perlin noise value given the UV coordinate.
+   1. Add a parametrized value to control the clipping.
+   1. Clip the pixels that get a value below zero.
+   1. Also clip the shadow caster Pass.
+   1. Use `Cull Off` to also render inner sides.
 
-1. **Step**
+   ```c
+   Pass
+   {
+      Cull Off // will render inside too
 
-   1. Sub Step.
-   1. Sub Step.
+      CGPROGRAM
 
-## References
+      fixed4 _Color;
+      float _Multiplier;
 
-- [Ref](https://adrianb.io/2014/08/09/perlinnoise.html)
-- [Ref](https://adrianb.io/2014/08/09/perlinnoise.html)
+      fixed4 frag (v2f IN) : SV_Target
+      {
+            float perlinNoise = perlin(IN.uv, 4, 4, _Time.z);
+
+            clip(perlinNoise + _Multiplier);
+
+            return _Color * perlinNoise;
+      }
+      ENDCG
+   }
+   ```
+
+   ![Gif](./docs/3a.gif)
+
+1. **Cosine**
+
+   1. Same approach as with the perlin noise, but using the `cos()` function.
+
+   ```c
+   fixed4 frag (v2f IN) : SV_Target
+   {
+         float cosY = cos(IN.position.y * _Threshold + _Time.z);
+
+         clip(cosY);
+
+         return fixed4(_Color * IN.diffuse, 1);
+   }
+   ```
+
+   ![Gif](./docs/3b.gif)
+
+1. **Shadow Casting**
+
+   1. Add shadow casting capabilities to the shaders, so the clipping is better appreciated.
+
+   ```c
+   Pass
+   {
+      Tags {"LightMode"="ShadowCaster"}
+
+      CGPROGRAM
+
+      struct v2f {
+         V2F_SHADOW_CASTER;
+      };
+
+      v2f vert(appdata_base v)
+      {
+         TRANSFER_SHADOW_CASTER_NORMALOFFSET(OUT)
+      }
+
+      float4 frag(v2f IN) : SV_Target
+      {
+         SHADOW_CASTER_FRAGMENT(i)
+      }
+      ENDCG
+   }
+   ```

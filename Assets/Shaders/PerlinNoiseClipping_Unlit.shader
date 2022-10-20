@@ -3,7 +3,7 @@ Shader "Unlit/PerlinNoiseClipping_Unlit"
     Properties
     {
         _Color("Color", Color) = (1,0,0,1)
-        _Multiplier("Clipping Multiplier", Range(-1.0, 1.0)) = 0
+        _Threshold("Threshold", Range(-1.0, 1.0)) = 0
     }
     SubShader
     {
@@ -24,13 +24,13 @@ Shader "Unlit/PerlinNoiseClipping_Unlit"
             #include "./shared/PerlinNoise.cginc"
 
             fixed4 _Color;
-            float _Multiplier;
+            float _Threshold;
 
             fixed4 frag (v2f IN) : SV_Target
             {
                 float perlinNoise = perlin(IN.uv, 4, 4, _Time.z);
 
-                clip(perlinNoise + _Multiplier);
+                clip(perlinNoise + _Threshold);
 
                 return _Color * perlinNoise;
             }
@@ -64,13 +64,13 @@ Shader "Unlit/PerlinNoiseClipping_Unlit"
                 return OUT;
             }
 
-            float _Multiplier;
+            float _Threshold;
 
             float4 frag(v2f IN) : SV_Target
             {
                 float perlinNoise = perlin(IN.uv, 4, 4, _Time.z);
 
-                clip(perlinNoise + _Multiplier); // to also clip the shadowcaster
+                clip(perlinNoise + _Threshold); // to also clip the shadowcaster
 
                 SHADOW_CASTER_FRAGMENT(i)
             }

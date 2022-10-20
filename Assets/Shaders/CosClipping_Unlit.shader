@@ -1,9 +1,9 @@
-Shader "Unlit/SinCosClipping_Unlit"
+Shader "Unlit/CosClipping_Unlit"
 {
     Properties
     {
         _Color("Color", Color) = (1,0,0,1)
-        _Multiplier("Clipping Multiplier", Range(0, 40)) = 10
+        _Threshold("Threshold", Range(0, 40)) = 10
     }
     SubShader
     {
@@ -23,11 +23,11 @@ Shader "Unlit/SinCosClipping_Unlit"
             #include "./shared/SimpleV2F.cginc"
 
             fixed4 _Color;
-            float _Multiplier;
+            float _Threshold;
 
             fixed4 frag (v2f IN) : SV_Target
             {
-                float cosY = cos(IN.position.y * _Multiplier + _Time.z);
+                float cosY = cos(IN.position.y * _Threshold + _Time.z);
 
                 clip(cosY);
 
@@ -62,11 +62,11 @@ Shader "Unlit/SinCosClipping_Unlit"
                 return OUT;
             }
 
-            float _Multiplier;
+            float _Threshold;
 
             float4 frag(v2f IN) : SV_Target
             {
-                float cosY = cos(IN.position.y * _Multiplier + _Time.z);
+                float cosY = cos(IN.position.y * _Threshold + _Time.z);
 
                 clip(cosY);
 
