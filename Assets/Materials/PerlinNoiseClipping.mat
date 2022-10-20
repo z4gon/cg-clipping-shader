@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MyMaterial
+  m_Name: PerlinNoiseClipping
   m_Shader: {fileID: 4800000, guid: e85c11165009b445380ce5f5d594c977, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords:

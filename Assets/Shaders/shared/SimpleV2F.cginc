@@ -8,15 +8,26 @@ struct v2f
     float4 vertex: SV_POSITION; // From Object-Space to Clip-Space
     float4 position: TEXCOORD1;
     float4 uv: TEXCOORD0;
+    fixed3 diffuse: COLOR0; // For lambert lighting
 };
 
 v2f vert (appdata_base v)
 {
-    v2f output;
+    v2f OUT;
 
-    output.vertex = UnityObjectToClipPos(v.vertex);
-    output.position = v.vertex;
-    output.uv = v.texcoord;
+    OUT.vertex = UnityObjectToClipPos(v.vertex);
+    OUT.position = v.vertex;
+    OUT.uv = v.texcoord;
 
-    return output;
+    // calculate Lambert lighting -----------------------------------------------------------
+    float3 lightDirection = _WorldSpaceLightPos0.xyz;
+
+    half3 worldNormal = UnityObjectToWorldNormal(v.normal);
+
+    // dot product between normal and light vector, provide the basis for the lit shading
+    half lightInfluence = max(0, dot(worldNormal, lightDirection)); // avoid negative values
+
+    OUT.diffuse = lightInfluence * _LightColor0.rgb;
+
+    return OUT;
 }
