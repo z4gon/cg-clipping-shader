@@ -50,10 +50,7 @@ fixed4 perlin(
     float2 uv,
     int columns,
     int rows,
-    float time = 1,
-    float offset = 0.5,
-    bool debugSquares = false,
-    bool debugGradients = false
+    float time = 1
 )
 {
     // square dimensions
@@ -107,8 +104,5 @@ fixed4 perlin(
         w.y
     );
 
-    float noise = (interpolatedDot * 0.5) + offset;
-    fixed4 color = fixed4(1,1,1,1) * noise;
-
-    return color;
+    return interpolatedDot;
 }

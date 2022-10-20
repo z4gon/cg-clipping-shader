@@ -11,18 +11,18 @@ struct v2f
     fixed3 diffuse: COLOR0; // For lambert lighting
 };
 
-v2f vert (appdata_base v)
+v2f vert (appdata_base IN)
 {
     v2f OUT;
 
-    OUT.vertex = UnityObjectToClipPos(v.vertex);
-    OUT.position = v.vertex;
-    OUT.uv = v.texcoord;
+    OUT.vertex = UnityObjectToClipPos(IN.vertex);
+    OUT.position = IN.vertex;
+    OUT.uv = IN.texcoord;
 
     // calculate Lambert lighting -----------------------------------------------------------
     float3 lightDirection = _WorldSpaceLightPos0.xyz;
 
-    half3 worldNormal = UnityObjectToWorldNormal(v.normal);
+    half3 worldNormal = UnityObjectToWorldNormal(IN.normal);
 
     // dot product between normal and light vector, provide the basis for the lit shading
     half lightInfluence = max(0, dot(worldNormal, lightDirection)); // avoid negative values
