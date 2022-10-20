@@ -3,11 +3,14 @@ Shader "Unlit/SinCosClipping_Unlit"
     Properties
     {
         _Color("Color", Color) = (1,0,0,1)
+        _Multiplier("Clipping Multiplier", Range(0, 40)) = 10
     }
     SubShader
     {
         Tags { "RenderType"="Opaque" }
         LOD 100
+
+        Cull Off
 
         Pass
         {
@@ -20,9 +23,14 @@ Shader "Unlit/SinCosClipping_Unlit"
             #include "./shared/SimpleV2F.cginc"
 
             fixed4 _Color;
+            float _Multiplier;
 
             fixed4 frag (v2f IN) : SV_Target
             {
+                float cosY = cos(IN.position.y * _Multiplier + _Time.z);
+
+                clip(cosY);
+
                 return fixed4(_Color * IN.diffuse, 1);
             }
             ENDCG
@@ -42,18 +50,26 @@ Shader "Unlit/SinCosClipping_Unlit"
             #include "UnityCG.cginc"
 
             struct v2f {
+                float4 position: TEXCOORD1;
                 V2F_SHADOW_CASTER;
             };
 
             v2f vert(appdata_base v)
             {
-                v2f o;
-                TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
-                return o;
+                v2f OUT;
+                OUT.position = v.vertex;
+                TRANSFER_SHADOW_CASTER_NORMALOFFSET(OUT)
+                return OUT;
             }
 
-            float4 frag(v2f i) : SV_Target
+            float _Multiplier;
+
+            float4 frag(v2f IN) : SV_Target
             {
+                float cosY = cos(IN.position.y * _Multiplier + _Time.z);
+
+                clip(cosY);
+
                 SHADOW_CASTER_FRAGMENT(i)
             }
             ENDCG
